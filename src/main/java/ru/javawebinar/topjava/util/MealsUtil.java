@@ -7,9 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,4 +42,26 @@ public class MealsUtil {
                                 caloriesSumByDate.get(meal.getDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
     }
+
+
+    public static List<MealWithExceed> getFilteredWithExceededByCycle(List<Meal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+
+        Map<LocalDate, Integer> caloriesSumPerDay = new HashMap<>();
+        for (Meal meal : mealList){
+            LocalDate mealDate = meal.getDate();
+            caloriesSumPerDay.put(mealDate, caloriesSumPerDay.getOrDefault(mealDate, 0));
+        }
+
+        List<MealWithExceed> mealWithExceedList = new ArrayList<>();
+        for (Meal meal : mealList) {
+            LocalDateTime localDateTime = meal.getDateTime();
+            if (TimeUtil.isBetween(localDateTime.toLocalTime(), startTime, endTime)) {
+                mealWithExceedList.add(new MealWithExceed(localDateTime, meal.getDescription()
+                        , meal.getCalories(), caloriesSumPerDay.get(meal.getDate()) > caloriesPerDay));
+            }
+        }
+
+        return mealWithExceedList;
+    }
+
 }
